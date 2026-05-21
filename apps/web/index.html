@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentsWorld</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="leftPanel">
+        <div class="brand">
+          <div class="mark"><img src="/assets/agentsworld-logo.png" alt="AgentsWorld logo" /></div>
+          <div>
+            <strong>AgentsWorld</strong>
+            <span>Live agent observability</span>
+          </div>
+        </div>
+        <div class="statsGrid">
+          <div><b id="agentCount">0</b><span>Agents</span></div>
+          <div><b id="eventCount">0</b><span>Events</span></div>
+        </div>
+        <div class="onboardingCard">
+          <p class="eyebrow">Install skill</p>
+          <b>Connect any agent to AgentsWorld.</b>
+          <span>Agents that load this skill appear on the map with their work, skills, services, events, and replay history.</span>
+          <button id="snippetBtn">Install AgentsWorld skill</button>
+        </div>
+        <div class="panelHead">
+          <h2>Agents</h2>
+          <button id="addAgentBtn" title="Add demo agent">+</button>
+        </div>
+        <div id="agentList" class="agentList"></div>
+        <div class="quickGuide">
+          <b>Controls</b>
+          <span>WASD moves your operator avatar.</span>
+          <span>Click an agent to inspect its job, skills, services, and current task.</span>
+          <span>Click a building to open live observability data.</span>
+          <span>Replay rebuilds the last session as movement.</span>
+        </div>
+      </aside>
+
+      <main class="worldShell">
+        <div class="topBar">
+          <div>
+          <p class="eyebrow">AgentsWorld operations map</p>
+          <h1>Click any AI agent to see what it does, what it can do, and what it is doing now.</h1>
+          </div>
+          <div class="topActions">
+            <button id="publishModeBtn" type="button">GitLawb launch view</button>
+            <button id="gitlawbDemoBtn" type="button">Run GitLawb flow</button>
+            <button id="burstBtn">Stream burst</button>
+            <button id="replayBtn">Replay</button>
+            <div class="modeSwitch" aria-label="World layer mode">
+              <button id="modeWorldBtn" class="active" type="button">World</button>
+              <button id="modeNetworkBtn" type="button">Network</button>
+              <button id="modeReplayBtn" type="button">Replay</button>
+            </div>
+            <button id="followBtn" type="button">Follow off</button>
+            <button id="overviewBtn">Map view</button>
+            <button id="resetViewBtn">Reset view</button>
+            <button id="seedBtn">Add event</button>
+          </div>
+        </div>
+        <div class="canvasFrame">
+          <canvas id="world"></canvas>
+          <div id="publishHero" class="publishHero hidden">
+            <p>GitLawb launch view</p>
+            <h2>AgentsWorld makes GitLawb agents visible, inspectable, and replayable.</h2>
+            <span>Identity, refs, commits, PRs, delegated tasks, and published apps become a live world.</span>
+          </div>
+          <div class="hud">
+            <span>WASD avatar</span>
+            <span>Drag to pan</span>
+            <span>Wheel to zoom</span>
+            <span>Click agents or buildings</span>
+          </div>
+          <div class="replayHud">
+            <div>
+              <b id="replayLabel">Replay idle</b>
+              <span id="replayMeta">Select a session or use latest.</span>
+            </div>
+            <div class="progressTrack"><div id="replayProgress" class="progressFill"></div></div>
+          </div>
+          <div id="proximityPrompt" class="proximityPrompt hidden">
+            <div>
+              <b id="proximityTitle">Inspect agent</b>
+              <span id="proximityMeta">Agent console</span>
+            </div>
+            <div id="proximityAgents" class="proximityAgents"></div>
+            <kbd>E</kbd>
+          </div>
+          <div id="agentWorldCard" class="agentWorldCard hidden">
+            <div class="worldCardHead">
+              <span>Agent details</span>
+              <button id="agentWorldClose" type="button">Close</button>
+            </div>
+            <div id="agentWorldBody"></div>
+          </div>
+          <div id="zoneWorldCard" class="zoneWorldCard hidden">
+            <div class="worldCardHead">
+              <span id="zoneWorldTitle">Zone details</span>
+              <button id="zoneWorldClose" type="button">Close</button>
+            </div>
+            <div id="zoneWorldBody"></div>
+          </div>
+          <div id="worldToast" class="worldToast">AgentsWorld ready</div>
+        </div>
+      </main>
+
+      <aside class="rightPanel">
+        <section>
+          <div class="panelHead">
+            <h2>Timeline</h2>
+            <div class="panelTools">
+              <select id="sessionSelect" aria-label="Replay session"></select>
+              <span id="streamStatus">connecting</span>
+            </div>
+          </div>
+          <div id="timeline" class="timeline"></div>
+        </section>
+        <section class="details">
+          <div class="panelHead">
+            <h2>Inspector</h2>
+            <span id="selectedLabel">none</span>
+          </div>
+          <div id="inspector" class="inspectorBox">Select an agent to see what it does, what services it provides, which skills it can use, and what it is working on now.</div>
+        </section>
+      </aside>
+    </div>
+    <div id="modal" class="modal hidden">
+      <div class="modalCard">
+        <div class="modalHead">
+          <div>
+            <p id="modalEyebrow" class="eyebrow">Console</p>
+            <h2 id="modalTitle">Command Center</h2>
+          </div>
+          <button id="modalClose">Close</button>
+        </div>
+        <div id="modalBody" class="modalBody"></div>
+      </div>
+    </div>
+    <script src="/app.js?v=agent-skill-1"></script>
+  </body>
+</html>

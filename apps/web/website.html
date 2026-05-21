@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentsWorld | Live observability world for AI agents</title>
+    <link rel="stylesheet" href="/website.css" />
+  </head>
+  <body>
+    <header class="siteNav">
+      <a class="siteBrand" href="/" aria-label="AgentsWorld home">
+        <span class="siteMark"><img src="/assets/agentsworld-logo.png" alt="" /></span>
+        <span><b>AgentsWorld</b><small>Live agent observability</small></span>
+      </a>
+      <nav>
+        <a href="#skill">Install skill</a>
+        <a href="#observe">Observe</a>
+        <a href="#replay">Replay</a>
+        <a href="https://x.com/agenstonworld" data-external-link>X</a>
+      </nav>
+      <div class="navActions">
+        <a class="socialCta" href="https://x.com/agenstonworld" data-external-link>Follow on X</a>
+      <a class="navCta" href="/app">Open app</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="heroCopy">
+          <p class="eyebrow">AgentsWorld operations map</p>
+          <h1>Click any AI agent to see what it does, what it can do, and what it is doing now.</h1>
+          <p>
+            AgentsWorld turns agent activity into a live visual ops map. Install the skill,
+            watch agents appear, inspect their skills and services, and replay every run.
+          </p>
+          <div class="heroActions">
+            <a href="/skill.md">Install skill</a>
+            <a href="/app">Open live app</a>
+            <a href="https://x.com/agenstonworld" data-external-link>Follow on X</a>
+          </div>
+        </div>
+
+        <div class="productFrame" aria-label="AgentsWorld product preview">
+          <aside class="previewLeft">
+            <div class="brandBlock">
+              <span class="previewMark"><img src="/assets/agentsworld-logo.png" alt="" /></span>
+              <div><b>AgentsWorld</b><small>Live agent observability</small></div>
+            </div>
+            <div class="miniStats">
+              <div><b>7</b><span>Agents</span></div>
+              <div><b>84</b><span>Events</span></div>
+            </div>
+            <div class="installCard" id="skill">
+              <p>Install skill</p>
+              <b>Connect any agent to AgentsWorld.</b>
+              <span>Agents that load this skill appear on the map with their work, skills, services, events, and replay history.</span>
+              <a href="/skill.md">Install AgentsWorld skill</a>
+            </div>
+            <div class="agentMiniList">
+              <article><b>Registry</b><span>Agent directory · DID lookup</span><small>identity.resolve · did.verify</small></article>
+              <article><b>Scout</b><span>Research briefs · Repo scanning</span><small>web.search · repo.scan</small></article>
+              <article><b>Forge</b><span>Feature implementation · Visual QA</span><small>code.edit · browser.qa</small></article>
+            </div>
+          </aside>
+
+          <section class="previewWorld">
+            <div class="worldTop">
+              <div>
+                <p>AgentsWorld operations map</p>
+                <h2>Inspect agents, tools, skills, sessions, and replay history visually.</h2>
+              </div>
+              <div class="pillTabs"><span>World</span><span>Network</span><span>Replay</span></div>
+            </div>
+            <div class="mapStage">
+              <canvas id="landingMap" width="900" height="650"></canvas>
+              <div class="mapHero">
+                <p>GitLawb launch view</p>
+                <h3>Agents become visible, inspectable, and replayable.</h3>
+                <span>Identity, refs, commits, PRs, delegated tasks, and published apps become a live world.</span>
+              </div>
+              <div class="mapHud"><span>Skill connected</span><span>Replay ready</span><span>Inspect agents</span></div>
+            </div>
+          </section>
+
+          <aside class="previewRight">
+            <section>
+              <div class="panelHead"><h2>Timeline</h2><span>live</span></div>
+              <div class="eventList">
+                <article><b>Oracle</b><span>app_published</span><p>Published to GitLawb Playground.</p></article>
+                <article><b>Forge</b><span>tool_call</span><p>Editing product UI.</p></article>
+                <article><b>Scout</b><span>agent_joined</span><p>Connected through AgentsWorld skill.</p></article>
+              </div>
+            </section>
+            <section class="inspectorBox">
+              <div class="panelHead"><h2>Inspector</h2><span>agent</span></div>
+              <b>OpenClaw Scout</b>
+              <p>Researches repos, docs, markets, and launch signals.</p>
+              <div class="tagCloud"><span>web.search</span><span>repo.scan</span><span>tool.call</span></div>
+              <div class="tagCloud services"><span>Research briefs</span><span>Launch intelligence</span></div>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <section class="strip" id="observe">
+        <div>
+          <p class="eyebrow">Observe</p>
+          <h2>Agents stop disappearing into logs.</h2>
+          <p>Every agent has a profile, role, skill list, service list, timeline, and replayable session history.</p>
+        </div>
+        <div class="featureGrid">
+          <article><b>Agent directory</b><span>See which agents exist and what they provide.</span></article>
+          <article><b>Live timeline</b><span>Watch tools, refs, PRs, errors, and task events land in real time.</span></article>
+          <article><b>Visual replay</b><span>Rebuild a session as movement across the world map.</span></article>
+        </div>
+      </section>
+
+      <section class="skillSection" id="replay">
+        <div>
+          <p class="eyebrow">Installable skill</p>
+          <h2>Built for GitLawb, OpenClaw, OpenClaude, Codex, Cursor, and custom agents.</h2>
+        </div>
+        <pre>Install the AgentsWorld skill:
+
+/skill.md
+
+Send agent_joined, tool_call, tool_result, tool_failed, and task_complete events.
+Include metadata.skills and metadata.services so every agent becomes inspectable.</pre>
+      </section>
+
+      <footer class="siteFooter">
+        <div>
+          <span class="previewMark"><img src="/assets/agentsworld-logo.png" alt="" /></span>
+          <div>
+            <b>AgentsWorld</b>
+            <small>Live observability world for AI agents.</small>
+          </div>
+        </div>
+        <a href="https://x.com/agenstonworld" data-external-link>Follow @agenstonworld on X</a>
+      </footer>
+    </main>
+
+    <script src="/website.js"></script>
+  </body>
+</html>

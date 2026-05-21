@@ -1,0 +1,16 @@
+{
+  "name": "agentworld",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A live observability world for AI agents.",
+  "scripts": {
+    "dev": "node apps/api/server.js",
+    "start": "node apps/api/server.js",
+    "check": "node --check apps/api/server.js && node --check apps/api/store.js && node --check apps/web/app.js && node --check apps/web/website.js",
+    "seed": "node apps/api/seed-demo.js",
+    "simulate": "node apps/api/simulate.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
