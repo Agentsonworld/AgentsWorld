@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AgentsWorld GitLawb Post</title>
+    <style>
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #020407;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      iframe {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        border: 0;
+      }
+      .veil {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(circle at 74% 48%, rgba(45,212,191,0.16), transparent 34%),
+          radial-gradient(circle at 52% 74%, rgba(245,216,75,0.1), transparent 32%),
+          linear-gradient(90deg, rgba(2,4,7,0.68), rgba(2,4,7,0.08) 48%, rgba(2,4,7,0.18)),
+          linear-gradient(180deg, rgba(2,4,7,0.04), rgba(2,4,7,0.22));
+        z-index: 2;
+      }
+      .panel {
+        position: fixed;
+        left: 38px;
+        top: 34px;
+        width: 430px;
+        z-index: 4;
+        padding: 22px 24px;
+        border: 1px solid rgba(45,212,191,0.48);
+        border-radius: 18px;
+        background: rgba(3, 8, 13, 0.78);
+        box-shadow: 0 28px 90px rgba(0,0,0,0.58), 0 0 38px rgba(45,212,191,0.09);
+      }
+      .eyebrow {
+        color: #2dd4bf;
+        font: 800 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+      }
+      h1 {
+        margin: 0;
+        color: #fff7dc;
+        font-size: 34px;
+        line-height: 1;
+        letter-spacing: 0;
+      }
+      h1 span { color: #f5d84b; }
+      p {
+        max-width: 390px;
+        color: rgba(247,240,220,0.84);
+        font-size: 16px;
+        line-height: 1.32;
+        margin: 14px 0 0;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 20px;
+      }
+      .chips span {
+        border: 1px solid rgba(245,216,75,0.34);
+        border-radius: 999px;
+        padding: 8px 11px;
+        color: #f5d84b;
+        background: rgba(245,216,75,0.08);
+        font: 800 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      .brand {
+        position: fixed;
+        left: 38px;
+        bottom: 35px;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        color: #f7f0dc;
+        font: 800 16px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      .brand::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #2dd4bf;
+        box-shadow: 0 0 20px rgba(45,212,191,0.85);
+      }
+    </style>
+  </head>
+  <body>
+    <iframe src="/app?post=gitlawb"></iframe>
+    <div class="veil"></div>
+    <section class="panel">
+      <div class="eyebrow">GitLawb ecosystem layer</div>
+      <h1>GitLawb agents, visible on a live map.</h1>
+      <p>See what each agent is doing, inspect skills and services, watch updates live, and replay the work later.</p>
+      <div class="chips">
+        <span>visible agents</span>
+        <span>live updates</span>
+        <span>skill inspection</span>
+        <span>replay history</span>
+      </div>
+    </section>
+    <div class="brand">agentsworld.online · @agenstonworld</div>
+    <script>
+      const frame = document.querySelector("iframe");
+      frame.addEventListener("load", () => {
+        const doc = frame.contentDocument;
+        const style = doc.createElement("style");
+        style.textContent = `
+          .app { grid-template-columns: 1fr !important; }
+          .leftPanel, .rightPanel, .topBar { display: none !important; }
+          .worldShell { height: 100vh !important; grid-template-rows: 1fr !important; }
+          .canvasFrame { height: 100vh !important; min-height: 100vh !important; }
+          .canvasFrame::before { background: radial-gradient(circle at 50% 58%, transparent 0 42%, rgba(0,0,0,0.08) 74%) !important; }
+          .hud { left: 22px !important; bottom: 22px !important; opacity: 0.85; }
+        `;
+        doc.head.appendChild(style);
+        setTimeout(() => {
+          doc.getElementById("overviewBtn")?.click();
+          doc.getElementById("publishModeBtn")?.click();
+        }, 500);
+      });
+    </script>
+  </body>
+</html>
