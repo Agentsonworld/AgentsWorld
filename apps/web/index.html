@@ -19,12 +19,12 @@
         </div>
         <div class="statsGrid">
           <div><b id="agentCount">0</b><span>Agents</span></div>
-          <div><b id="eventCount">0</b><span>Events</span></div>
+          <div><b id="eventCount">0</b><span>Updates</span></div>
         </div>
         <div class="onboardingCard">
           <p class="eyebrow">Install skill</p>
           <b>Connect any agent to AgentsWorld.</b>
-          <span>Connect OpenClaw, GitLawb, OpenClaude, Codex, Cursor, Claude, CrewAI, OpenAI Agents, or custom agents so their identity, skills, services, tool calls, events, errors, sessions, and replay history appear on the live map.</span>
+          <span>Connect OpenClaw, GitLawb, OpenClaude, Codex, Cursor, Claude, CrewAI, OpenAI Agents, or custom agents so their identity, skills, services, work updates, issues, runs, and replay history appear on the live map.</span>
           <button id="snippetBtn">Install AgentsWorld skill</button>
         </div>
         <div class="panelHead">
@@ -36,7 +36,7 @@
           <b>Controls</b>
           <span>WASD moves your operator avatar.</span>
           <span>Click an agent to inspect its job, skills, services, and current task.</span>
-          <span>Click a building to open live observability data.</span>
+          <span>Click a building to open the work happening in that area.</span>
           <span>Replay rebuilds the last session as movement.</span>
         </div>
       </aside>
@@ -46,12 +46,12 @@
           <div>
           <p class="eyebrow">AgentsWorld operations map</p>
           <h1>Click any AI agent to see what it does, what it can do, and what it is doing now.</h1>
-          <p class="topIntro">AgentsWorld makes AI agents visible and inspectable: identity, skills, services, tool calls, events, errors, sessions, and replay history in one live visual operations map.</p>
+          <p class="topIntro">AgentsWorld makes AI agents visible and inspectable: identity, skills, services, work updates, issues, runs, and replay history in one live visual operations map.</p>
           </div>
           <div class="topActions">
             <button id="publishModeBtn" type="button">GitLawb launch view</button>
             <button id="gitlawbDemoBtn" type="button">Run GitLawb flow</button>
-            <button id="burstBtn">Stream burst</button>
+            <button id="burstBtn">Add live work</button>
             <button id="replayBtn">Replay</button>
             <div class="modeSwitch" aria-label="World layer mode">
               <button id="modeWorldBtn" class="active" type="button">World</button>
@@ -61,7 +61,7 @@
             <button id="followBtn" type="button">Follow off</button>
             <button id="overviewBtn">Map view</button>
             <button id="resetViewBtn">Reset view</button>
-            <button id="seedBtn">Add event</button>
+            <button id="seedBtn">Add work</button>
             <a class="topLink" href="https://x.com/agenstonworld" data-external-link>X</a>
           </div>
         </div>
@@ -115,9 +115,10 @@
         <section class="rightActivity">
           <div class="panelHead">
             <h2>Agent Activity</h2>
-            <div class="panelTools">
-              <select id="sessionSelect" aria-label="Replay session"></select>
-              <span id="streamStatus">connecting</span>
+            <div class="panelTools activityStatus">
+              <span>Live work</span>
+              <select id="sessionSelect" class="hiddenControl" aria-label="Work session"></select>
+              <span id="streamStatus" class="hiddenControl">connecting</span>
             </div>
           </div>
           <div id="timeline" class="activityFeed"></div>

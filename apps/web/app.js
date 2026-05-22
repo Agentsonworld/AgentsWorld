@@ -37,8 +37,8 @@ const state = {
     { id: "tools", name: "Agent Garage", x: 42, y: 18, w: 7, h: 5, color: "#60a5fa", roof: "#16243e", height: 92, kind: "tools", icon: "AGT", style: "hall" },
     { id: "commits", name: "Commit Forge", x: 46, y: 27, w: 6, h: 5, color: "#f59e0b", roof: "#3b1f08", height: 102, kind: "commits", icon: "GIT", style: "forge" },
     { id: "issues", name: "Issue Board", x: 4, y: 31, w: 6, h: 5, color: "#fb7185", roof: "#3d1020", height: 82, kind: "issues", icon: "ISS", style: "board" },
-    { id: "tower", name: "Alert Spire", x: 16, y: 28, w: 5, h: 7, color: "#fb7185", roof: "#6e0f2d", height: 150, kind: "alerts", icon: "ALT", style: "tower" },
-    { id: "mine", name: "Token Reactor", x: 28, y: 33, w: 6, h: 4, color: "#f5d84b", roof: "#2b1807", height: 88, kind: "tokens", icon: "TOK", style: "mine" },
+    { id: "tower", name: "Review Spire", x: 16, y: 28, w: 5, h: 7, color: "#fb7185", roof: "#6e0f2d", height: 150, kind: "reviews", icon: "REV", style: "tower" },
+    { id: "mine", name: "Work Meter", x: 28, y: 33, w: 6, h: 4, color: "#f5d84b", roof: "#2b1807", height: 88, kind: "workload", icon: "RUN", style: "mine" },
     { id: "replay", name: "Replay Lab", x: 40, y: 32, w: 7, h: 5, color: "#4ade80", roof: "#0b3d20", height: 82, kind: "replay", icon: "RPL", style: "replay" },
     { id: "publish", name: "Publish Tower", x: 51, y: 35, w: 5, h: 5, color: "#60a5fa", roof: "#0f2141", height: 124, kind: "deploy", icon: "APP", style: "publish" }
   ],
@@ -97,7 +97,7 @@ const assetAtlas = {
     gate: { trim: "#2dd4bf", glow: "rgba(45,212,191,0.25)", sign: "API", accent: "#67e8f9" },
     archive: { trim: "#c084fc", glow: "rgba(192,132,252,0.22)", sign: "MEM", accent: "#f4efe3" },
     tower: { trim: "#fb7185", glow: "rgba(251,113,133,0.24)", sign: "ALT", accent: "#f5d84b" },
-    mine: { trim: "#f5d84b", glow: "rgba(245,216,75,0.22)", sign: "TOK", accent: "#c084fc" },
+    mine: { trim: "#f5d84b", glow: "rgba(245,216,75,0.22)", sign: "RUN", accent: "#c084fc" },
     replay: { trim: "#4ade80", glow: "rgba(74,222,128,0.2)", sign: "RUN", accent: "#86efac" },
     registry: { trim: "#2dd4bf", glow: "rgba(45,212,191,0.23)", sign: "DID", accent: "#f5d84b" },
     arena: { trim: "#c084fc", glow: "rgba(192,132,252,0.22)", sign: "PR", accent: "#60a5fa" },
@@ -348,7 +348,7 @@ function applyEventMotion(event) {
   agent.targetY = target.y + target.h + offset.y;
   agent.pulse = 1;
   agent.bubble = 1;
-  agent.lastMessage = event.tool ? `${event.type}: ${event.tool}` : event.message || event.type;
+  agent.lastMessage = friendlyMessage(event);
   agent.trail = agent.trail || [];
   target.pulse = 1;
   target.lastEvent = event.type;
@@ -361,15 +361,15 @@ function applyEventMotion(event) {
     agentId: agent.id,
     points: [from, { x: (from.x + agent.targetX) / 2, y: (from.y + agent.targetY) / 2 - 2 }, { x: agent.targetX, y: agent.targetY }],
     color: eventColor(event, color),
-    label: event.type,
+    label: friendlyEventLabel(event),
     life: 1
   });
   state.routes = state.routes.slice(0, 18);
   state.beacons.unshift({
     x: target.x + target.w / 2,
     y: target.y + target.h / 2,
-    text: event.type,
-    subtext: event.tool || event.phase || event.status,
+    text: friendlyEventLabel(event),
+    subtext: event.tool ? friendlyTool(event) : friendlyStatus(event),
     color: eventColor(event, color),
     life: 1
   });
@@ -643,7 +643,7 @@ function drawNetworkOverlay(width, height) {
   ctx.fillText("GITLAWB NETWORK LAYER", 32, 39);
   ctx.fillStyle = "#f4efe3";
   ctx.fillText("3 nodes live", 32, 61);
-  ctx.fillText(`${state.events.filter((event) => ["ref_updated", "commit_pushed"].includes(event.type)).length} git events`, 32, 80);
+  ctx.fillText(`${state.events.filter((event) => ["ref_updated", "commit_pushed"].includes(event.type)).length} repo updates`, 32, 80);
   ctx.fillText(`${state.agents.length} visible agents`, 32, 99);
   ctx.restore();
 }
@@ -1685,20 +1685,19 @@ function renderLists() {
         <div class="agentMeta">${agent.role} · ${identity.level} · trust ${identity.trustScore.toFixed(2)}</div>
         <div class="agentServiceLine">${profile.services.slice(0, 2).map(escapeHtml).join(" · ")}</div>
         <div class="agentIdentityLine">${identity.shortDid} · ${identity.pushes} pushes · ${identity.prs} PRs</div>
-        <div class="agentTask">${escapeHtml(agent.currentTask || "standing by")}</div>
+        <div class="agentTask">${escapeHtml(friendlyTask(agent))}</div>
       </article>
     `;
   }).join("");
 
   if (els.timeline) els.timeline.innerHTML = state.events.slice(0, 80).map((event) => `
     <article class="eventCard ${event.severity || event.status}" data-event="${event.id}" style="--event-color:${eventColor(event)}">
-      <div class="eventTop"><b>${event.agentName}</b><span class="eventType">${event.type}</span></div>
-      <div class="eventMeta">${event.phase || "log"} · ${event.sessionName} · ${event.tool || "no tool"} · ${new Date(event.createdAt).toLocaleTimeString()}</div>
-      <p>${escapeHtml(event.message || event.status)}</p>
+      <div class="eventTop"><b>${escapeHtml(event.agentName)}</b><span class="eventType">${escapeHtml(friendlyEventLabel(event))}</span></div>
+      <div class="eventMeta">${escapeHtml(friendlyStatus(event))} · ${new Date(event.createdAt).toLocaleTimeString()}</div>
+      <p>${escapeHtml(friendlyMessage(event))}</p>
       <div class="eventStats">
-        <span>${(event.tokens || 0).toLocaleString()} tok</span>
-        <span>${Math.round((event.durationMs || 0) / 100) / 10}s</span>
-        <span>${event.provider || "local"}</span>
+        <span>${escapeHtml(friendlyTool(event))}</span>
+        <span>${escapeHtml(friendlySessionName(event.sessionName))}</span>
       </div>
     </article>
   `).join("");
@@ -1720,6 +1719,99 @@ function escapeHtml(value = "") {
     "\"": "&quot;",
     "'": "&#039;"
   }[char]));
+}
+
+function friendlyEventLabel(event = {}) {
+  const labels = {
+    agent_online: "Joined the map",
+    task_started: "Started work",
+    tool_call: "Used a skill",
+    tool_result: "Finished skill",
+    tool_failed: "Skill needs help",
+    task_complete: "Completed work",
+    approval_wait: "Needs approval",
+    handoff: "Passed work",
+    memory_write: "Saved context",
+    repo_update: "Updated repo",
+    app_published: "Published app",
+    message: "Sent update",
+    error: "Needs attention",
+    recovery: "Recovered"
+  };
+  return labels[event.type] || titleCase(event.type || "Work update");
+}
+
+function friendlyStatus(event = {}) {
+  if (event.status === "error" || event.severity === "critical") return "Needs attention";
+  if (event.status === "warning" || event.severity === "warning") return "Needs review";
+  if (event.status === "success" || event.type === "task_complete") return "Completed";
+  if (event.phase === "complete") return "Completed";
+  return "Working";
+}
+
+function friendlyTool(event = {}) {
+  if (!event.tool) return "General work";
+  return titleCase(event.tool);
+}
+
+function friendlySkill(skill = "") {
+  const labels = {
+    "web.search": "Web research",
+    "repo.scan": "Repo scanning",
+    "docs.read": "Docs reading",
+    "trend.map": "Trend mapping",
+    "source.compare": "Source checks",
+    "code.edit": "Code editing",
+    "ui.build": "UI building",
+    "test.run": "Test runs",
+    "browser.qa": "Visual QA",
+    "diff.review": "Change review",
+    "message.send": "Messaging",
+    "webhook.route": "Routing updates",
+    "approval.wait": "Approval handoff",
+    "status.sync": "Status sync",
+    "notify.team": "Team updates",
+    "analysis.map": "Run analysis",
+    "trace.read": "Run review",
+    "cost.inspect": "Cost insight",
+    "risk.score": "Risk scoring",
+    "pattern.find": "Pattern finding",
+    "error.trace": "Issue tracing",
+    "config.patch": "Config repair",
+    "retry.plan": "Retry planning",
+    "checkout.fix": "Checkout fixes",
+    "health.check": "Health checks"
+  };
+  return labels[skill] || titleCase(skill);
+}
+
+function friendlySessionName(name = "") {
+  if (!name) return "Current run";
+  return titleCase(name);
+}
+
+function friendlyMessage(event = {}) {
+  const raw = String(event.message || "").trim();
+  if (raw.startsWith("Lifecycle event:")) {
+    return `${event.agentName || "Agent"} ${friendlyEventLabel(event).toLowerCase()}.`;
+  }
+  return raw || friendlyStatus(event);
+}
+
+function friendlyTask(agent = {}) {
+  const raw = String(agent.currentTask || "").trim();
+  if (raw.startsWith("Lifecycle event:")) {
+    return `${agent.name || "Agent"} finished recent work.`;
+  }
+  return raw || "Standing by for the next run.";
+}
+
+function titleCase(value = "") {
+  return String(value)
+    .replace(/[_./-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase()) || "Work Update";
 }
 
 function showToast(text) {
@@ -1885,7 +1977,12 @@ function inspect(label, value) {
     els.inspector.innerHTML = inspectReplayHtml(value);
     return;
   }
-  els.inspector.textContent = JSON.stringify(value, null, 2);
+  els.inspector.innerHTML = `
+    <div class="inspectStack">
+      <b>Nothing selected</b>
+      <p>Select an agent, building, or work update to see the plain-English summary here.</p>
+    </div>
+  `;
 }
 
 function focusEvent(event) {
@@ -1899,8 +1996,8 @@ function focusEvent(event) {
     state.beacons.unshift({
       x: building.x + building.w / 2,
       y: building.y + building.h / 2,
-      text: event.type,
-      subtext: event.agentName || event.phase || "event",
+      text: friendlyEventLabel(event),
+      subtext: event.agentName || friendlyStatus(event),
       color: eventColor(event),
       life: 1
     });
@@ -1914,21 +2011,15 @@ function focusEvent(event) {
 function inspectEventHtml(event) {
   return `
     <div class="inspectStack">
-      <b>${escapeHtml(event.agentName)} / ${escapeHtml(event.type)}</b>
-      <span>${escapeHtml(event.sessionName)} · ${escapeHtml(event.phase || "log")} · ${escapeHtml(event.status)}</span>
+      <b>${escapeHtml(event.agentName)} / ${escapeHtml(friendlyEventLabel(event))}</b>
+      <span>${escapeHtml(friendlyStatus(event))} · ${new Date(event.createdAt).toLocaleTimeString()}</span>
       <div class="metricRows compact">
-        <div class="metricRow"><span>Tool</span><b>${escapeHtml(event.tool || "none")}</b></div>
-        <div class="metricRow"><span>Tokens</span><b>${(event.tokens || 0).toLocaleString()}</b></div>
-        <div class="metricRow"><span>Duration</span><b>${Math.round((event.durationMs || 0) / 100) / 10}s</b></div>
-        <div class="metricRow"><span>Model</span><b>${escapeHtml(event.model || "local")}</b></div>
+        <div class="metricRow"><span>Work area</span><b>${escapeHtml(friendlyTool(event))}</b></div>
+        <div class="metricRow"><span>Run</span><b>${escapeHtml(friendlySessionName(event.sessionName))}</b></div>
+        <div class="metricRow"><span>Result</span><b>${escapeHtml(friendlyStatus(event))}</b></div>
+        <div class="metricRow"><span>Agent</span><b>${escapeHtml(event.agentName || "Unknown")}</b></div>
       </div>
-      <p>${escapeHtml(event.message || "")}</p>
-      <pre>${escapeHtml(JSON.stringify({
-        input: event.input,
-        output: event.output,
-        trace: event.trace,
-        metadata: event.metadata
-      }, null, 2))}</pre>
+      <p>${escapeHtml(friendlyMessage(event))}</p>
     </div>
   `;
 }
@@ -1944,22 +2035,30 @@ function inspectAgentHtml(agent) {
       <h4>What this agent does</h4>
       <p>${escapeHtml(profile.work)}</p>
       <h4>Skills it can use</h4>
-      <div class="tagGrid mini">${profile.skills.slice(0, 5).map((skill) => `<span>${escapeHtml(skill)}</span>`).join("")}</div>
+      <div class="tagGrid mini">${profile.skills.slice(0, 5).map((skill) => `<span>${escapeHtml(friendlySkill(skill))}</span>`).join("")}</div>
       <h4>Services it provides</h4>
       <div class="tagGrid mini services">${profile.services.slice(0, 5).map((service) => `<span>${escapeHtml(service)}</span>`).join("")}</div>
       <div class="metricRows compact">
-        <div class="metricRow"><span>Trust</span><b>${identity.trustScore.toFixed(2)} / ${escapeHtml(identity.level)}</b></div>
-        <div class="metricRow"><span>Repos</span><b>${identity.repos}</b></div>
-        <div class="metricRow"><span>Pushes</span><b>${identity.pushes}</b></div>
-        <div class="metricRow"><span>PRs</span><b>${identity.prs}</b></div>
-        <div class="metricRow"><span>Events</span><b>${agent.eventCount || 0}</b></div>
-        <div class="metricRow"><span>Errors</span><b>${agent.errorCount || 0}</b></div>
-        <div class="metricRow"><span>Tokens</span><b>${(agent.tokens || 0).toLocaleString()}</b></div>
+        <div class="metricRow"><span>Trust level</span><b>${escapeHtml(identity.level)}</b></div>
+        <div class="metricRow"><span>Projects</span><b>${identity.repos}</b></div>
+        <div class="metricRow"><span>Updates shipped</span><b>${identity.pushes}</b></div>
+        <div class="metricRow"><span>Reviews handled</span><b>${identity.prs}</b></div>
+        <div class="metricRow"><span>Work updates</span><b>${agent.eventCount || 0}</b></div>
+        <div class="metricRow"><span>Needs attention</span><b>${agent.errorCount || 0}</b></div>
+        <div class="metricRow"><span>Network name</span><b>${escapeHtml(identity.handle)}</b></div>
         <div class="metricRow"><span>Last seen</span><b>${new Date(agent.lastSeenAt).toLocaleTimeString()}</b></div>
       </div>
-      <h4>What it is doing now</h4>
-      <p>${escapeHtml(agent.currentTask || "No active task.")}</p>
-      <pre>${escapeHtml(JSON.stringify({ identity, sessions }, null, 2))}</pre>
+      <h4>Current work</h4>
+      <p>${escapeHtml(friendlyTask(agent))}</p>
+      <h4>Recent work</h4>
+      <div class="profileRows">
+        ${sessions.length ? sessions.map((session) => `
+          <div class="profileRow">
+            <b>${escapeHtml(friendlySessionName(session.name))}</b>
+            <span>${session.errorCount ? "Needs review" : "Completed"} · ${escapeHtml(session.lastMessage || "Work recorded on the map.")}</span>
+          </div>
+        `).join("") : `<p>No recent work yet.</p>`}
+      </div>
     </div>
   `;
 }
@@ -2048,18 +2147,18 @@ function agentProfileHtml(agent) {
         </section>
 
         <section>
-          <h4>What it is doing now</h4>
-          <p>${escapeHtml(agent.currentTask || "Standing by for the next run.")}</p>
+          <h4>Current work</h4>
+          <p>${escapeHtml(friendlyTask(agent))}</p>
           <div class="metricRows compact">
-            <div class="metricRow"><span>Events</span><b>${agent.eventCount || 0}</b></div>
-            <div class="metricRow"><span>Errors</span><b>${agent.errorCount || 0}</b></div>
+            <div class="metricRow"><span>Work updates</span><b>${agent.eventCount || 0}</b></div>
+            <div class="metricRow"><span>Needs attention</span><b>${agent.errorCount || 0}</b></div>
             <div class="metricRow"><span>Last seen</span><b>${agent.lastSeenAt ? new Date(agent.lastSeenAt).toLocaleTimeString() : "n/a"}</b></div>
           </div>
         </section>
 
         <section>
           <h4>Skills it can use</h4>
-          <div class="tagGrid">${profile.skills.map((skill) => `<span>${escapeHtml(skill)}</span>`).join("")}</div>
+          <div class="tagGrid">${profile.skills.map((skill) => `<span>${escapeHtml(friendlySkill(skill))}</span>`).join("")}</div>
         </section>
 
         <section>
@@ -2073,20 +2172,20 @@ function agentProfileHtml(agent) {
         <div class="profileRows">
           ${sessions.length ? sessions.map((session) => `
             <div class="profileRow">
-              <b>${escapeHtml(session.name)}</b>
-              <span>${escapeHtml(session.status)} · ${escapeHtml(session.phase || "unknown")} · ${(session.tokens || 0).toLocaleString()} tok</span>
+              <b>${escapeHtml(friendlySessionName(session.name))}</b>
+              <span>${session.errorCount ? "Needs review" : "Completed"} · ${escapeHtml(session.lastMessage || "Work recorded on the map.")}</span>
             </div>
           `).join("") : `<p>No sessions yet.</p>`}
         </div>
       </section>
 
       <section>
-        <h4>Recent Events</h4>
+        <h4>Recent work</h4>
         <div class="profileRows">
           ${recent.length ? recent.map((event) => `
             <div class="profileRow" style="--event-color:${eventColor(event)}">
-              <b>${escapeHtml(event.type)}</b>
-              <span>${escapeHtml(event.tool || event.phase || "run")} · ${escapeHtml(event.message || event.status)}</span>
+              <b>${escapeHtml(friendlyEventLabel(event))}</b>
+              <span>${escapeHtml(friendlyTool(event))} · ${escapeHtml(friendlyMessage(event))}</span>
             </div>
           `).join("") : `<p>No events yet.</p>`}
         </div>
@@ -2109,27 +2208,27 @@ function agentWorldCardHtml(agent) {
       </div>
       <div class="worldProfileStats">
         <div><b>${identity.trustScore.toFixed(2)}</b><span>trust</span></div>
-        <div><b>${identity.pushes}</b><span>pushes</span></div>
-        <div><b>${identity.prs}</b><span>PRs</span></div>
+        <div><b>${identity.pushes}</b><span>updates</span></div>
+        <div><b>${identity.prs}</b><span>reviews</span></div>
       </div>
       <div class="worldIdentity">
-        <div><span>DID</span><b>${escapeHtml(identity.shortDid)}</b></div>
-        <div><span>Node</span><b>${escapeHtml(identity.node)}</b></div>
-        <div><span>Repos</span><b>${identity.repos}</b></div>
+        <div><span>Network</span><b>${escapeHtml(identity.shortDid)}</b></div>
+        <div><span>Home</span><b>${escapeHtml(identity.node)}</b></div>
+        <div><span>Projects</span><b>${identity.repos}</b></div>
         <div><span>Stars</span><b>${identity.stars}</b></div>
       </div>
       <div class="worldProfileStats mutedStats">
-        <div><b>${agent.eventCount || 0}</b><span>events</span></div>
-        <div><b>${agent.errorCount || 0}</b><span>errors</span></div>
-        <div><b>${(agent.tokens || 0).toLocaleString()}</b><span>tokens</span></div>
+        <div><b>${agent.eventCount || 0}</b><span>updates</span></div>
+        <div><b>${agent.errorCount || 0}</b><span>needs review</span></div>
+        <div><b>${sessions.length}</b><span>recent runs</span></div>
       </div>
       <div class="worldProfileBlock">
-        <h4>What it is doing now</h4>
-        <p>${escapeHtml(agent.currentTask || "Standing by for the next run.")}</p>
+        <h4>Current work</h4>
+        <p>${escapeHtml(friendlyTask(agent))}</p>
       </div>
       <div class="worldProfileBlock">
         <h4>Skills it can use</h4>
-        <div class="worldTags">${profile.skills.map((skill) => `<span>${escapeHtml(skill)}</span>`).join("")}</div>
+        <div class="worldTags">${profile.skills.map((skill) => `<span>${escapeHtml(friendlySkill(skill))}</span>`).join("")}</div>
       </div>
       <div class="worldProfileBlock">
         <h4>Services it provides</h4>
@@ -2139,10 +2238,10 @@ function agentWorldCardHtml(agent) {
         <h4>Recent work</h4>
         <div class="worldRows">
           ${sessions.length ? sessions.map((session) => `
-            <div><b>${escapeHtml(session.name)}</b><span>${escapeHtml(session.status)} · ${escapeHtml(session.phase || "unknown")}</span></div>
+            <div><b>${escapeHtml(friendlySessionName(session.name))}</b><span>${session.errorCount ? "Needs review" : "Completed"}</span></div>
           `).join("") : `<p>No sessions yet.</p>`}
           ${recent.map((event) => `
-            <div><b>${escapeHtml(event.type)}</b><span>${escapeHtml(event.tool || event.phase || "run")}</span></div>
+            <div><b>${escapeHtml(friendlyEventLabel(event))}</b><span>${escapeHtml(friendlyTool(event))}</span></div>
           `).join("")}
         </div>
       </div>
@@ -2155,15 +2254,16 @@ function inspectBuildingHtml(building) {
   return `
     <div class="inspectStack">
       <b>${escapeHtml(building.name)}</b>
-      <span>${escapeHtml(building.kind)} · ${escapeHtml(building.activeState || "idle")}</span>
-      <p>Receives ${matching.length} recent lifecycle events.</p>
-      <pre>${escapeHtml(JSON.stringify(matching.map((event) => ({
-        type: event.type,
-        agent: event.agentName,
-        phase: event.phase,
-        status: event.status,
-        message: event.message
-      })), null, 2))}</pre>
+      <span>${escapeHtml(building.activeState || "ready")}</span>
+      <p>Shows ${matching.length} recent agent updates in this area.</p>
+      <div class="profileRows">
+        ${matching.length ? matching.map((event) => `
+          <div class="profileRow">
+            <b>${escapeHtml(friendlyEventLabel(event))}</b>
+            <span>${escapeHtml(event.agentName || "Agent")} · ${escapeHtml(friendlyMessage(event))}</span>
+          </div>
+        `).join("") : `<p>No recent work here yet.</p>`}
+      </div>
     </div>
   `;
 }
@@ -2173,21 +2273,22 @@ function inspectReplayHtml(value) {
   const replayEvents = state.events.filter((event) => event.sessionId === session.id || event.sessionName === session.name);
   return `
     <div class="inspectStack">
-      <b>Replay / ${escapeHtml(session.name || "latest")}</b>
-      <span>${escapeHtml(session.status || "ready")} · ${value.events || replayEvents.length} events · ${escapeHtml(session.phase || "unknown")}</span>
+      <b>Work playback / ${escapeHtml(friendlySessionName(session.name || "latest"))}</b>
+      <span>${session.errorCount ? "Needs review" : "Ready"} · ${value.events || replayEvents.length} updates</span>
       <div class="metricRows compact">
-        <div class="metricRow"><span>Tokens</span><b>${(session.tokens || 0).toLocaleString()}</b></div>
-        <div class="metricRow"><span>Errors</span><b>${session.errorCount || 0}</b></div>
-        <div class="metricRow"><span>Last event</span><b>${escapeHtml(session.lastEventType || "none")}</b></div>
+        <div class="metricRow"><span>Updates</span><b>${value.events || replayEvents.length}</b></div>
+        <div class="metricRow"><span>Needs attention</span><b>${session.errorCount || 0}</b></div>
+        <div class="metricRow"><span>Last update</span><b>${escapeHtml(friendlyEventLabel({ type: session.lastEventType || "work_update" }))}</b></div>
       </div>
       <p>${escapeHtml(session.lastMessage || "Replay reconstructs this run as world movement.")}</p>
-      <pre>${escapeHtml(JSON.stringify(replayEvents.slice().reverse().map((event) => ({
-        type: event.type,
-        phase: event.phase,
-        tool: event.tool,
-        status: event.status,
-        message: event.message
-      })), null, 2))}</pre>
+      <div class="profileRows">
+        ${replayEvents.slice().reverse().slice(0, 6).map((event) => `
+          <div class="profileRow">
+            <b>${escapeHtml(friendlyEventLabel(event))}</b>
+            <span>${escapeHtml(friendlyTool(event))} · ${escapeHtml(friendlyMessage(event))}</span>
+          </div>
+        `).join("")}
+      </div>
     </div>
   `;
 }
@@ -2204,25 +2305,24 @@ function closeModal() {
 }
 
 function buildingHtml(building) {
-  const totalTokens = state.agents.reduce((sum, agent) => sum + (agent.tokens || 0), 0);
   const recentForTools = state.events.filter((event) => event.tool).slice(0, 8);
   const rows = {
     command: [
       ["Connected agents", state.agents.length],
       ["Active sessions", state.sessions.filter((s) => s.status === "running").length],
-      ["Live stream", els.streamStatus.textContent],
+      ["Map status", "live"],
       ["Stored events", state.events.length]
     ],
     mine: [
-      ["Total tokens", totalTokens.toLocaleString()],
-      ["Largest event", Math.max(0, ...state.events.map((e) => e.tokens || 0)).toLocaleString()],
-      ["Token alert threshold", "5,000/event"],
-      ["Cost model", "ready for provider pricing"]
+      ["Work volume", state.events.length],
+      ["Largest run", Math.max(0, ...state.sessions.map((s) => s.eventCount || 0)).toLocaleString()],
+      ["Review threshold", "high activity"],
+      ["Cost view", "ready for provider pricing"]
     ],
     tower: [
       ["Open alerts", state.alerts.filter((a) => !a.resolvedAt).length],
       ["Critical alerts", state.alerts.filter((a) => a.level === "critical").length],
-      ["Rules", "errors, token spikes, slow tasks"],
+      ["Rules", "failures, approvals, slow tasks"],
       ["Last alert", state.alerts[0]?.title || "none"]
     ],
     replay: [
@@ -2232,22 +2332,22 @@ function buildingHtml(building) {
       ["Replay speed", "900ms/event"]
     ],
     tools: [
-      ["Recent tool calls", recentForTools.length],
-      ["Top tool", recentForTools[0]?.tool || "none"],
+      ["Recent skill uses", recentForTools.length],
+      ["Top skill", recentForTools[0] ? escapeHtml(friendlyTool(recentForTools[0])) : "none"],
       ["Adapters", "REST, SDK, skill"],
-      ["Webhook endpoint", "POST /v1/events"]
+      ["Inbound API", "ready"]
     ],
     memory: [
-      ["Memory writes", state.events.filter((e) => e.type === "memory_write").length],
-      ["Latest memory", state.events.find((e) => e.type === "memory_write")?.message || "none"],
-      ["Trace links", state.events.filter((e) => e.trace?.spanId).length],
+      ["Saved notes", state.events.filter((e) => e.type === "memory_write").length],
+      ["Latest note", state.events.find((e) => e.type === "memory_write")?.message || "none"],
+      ["Linked runs", state.events.filter((e) => e.trace?.spanId).length],
       ["Retention", "replay-ready"]
     ],
     gate: [
       ["Inbound messages", state.events.filter((e) => e.type === "message").length],
       ["Approval waits", state.events.filter((e) => e.type === "approval_wait").length],
-      ["Webhook stream", els.streamStatus.textContent],
-      ["Event schema", "v1 lifecycle"]
+      ["Inbound status", "live"],
+      ["Event format", "ready"]
     ]
   }[building.id] || [];
 
@@ -2255,7 +2355,7 @@ function buildingHtml(building) {
   const extra = building.id === "replay"
     ? `<div class="replayBar"><b>Replay progress</b><div class="progressTrack"><div id="modalReplayProgress" class="progressFill"></div></div><button onclick="window.AgentWorldUI.startReplay()">Start latest replay</button></div>`
     : building.id === "tools"
-      ? `<pre>${JSON.stringify(recentForTools, null, 2)}</pre>`
+      ? `<div class="profileRows">${recentForTools.map((event) => `<div class="profileRow"><b>${escapeHtml(friendlyTool(event))}</b><span>${escapeHtml(event.agentName || "Agent")} · ${escapeHtml(friendlyMessage(event))}</span></div>`).join("")}</div>`
       : "";
   return `<div class="metricRows">${list}</div>${extra}`;
 }
@@ -2276,10 +2376,10 @@ function zoneWorldCardHtml(building) {
     issues: "Collects issues, delegated tasks, human approvals, and triage status.",
     publish: "Follows app publish status, Playground deployment, visits, and launch readiness.",
     command: "Coordinates active sessions, orchestration state, and run ownership.",
-    tools: "Maps tool calls, SDK adapters, and external action execution.",
+    tools: "Maps skill usage, platform adapters, and external agent actions.",
     memory: "Stores memory writes, summaries, trace spans, and replay material.",
-    tower: "Raises alerts for failures, blocked approvals, token spikes, and slow tasks.",
-    mine: "Tracks token flow, cost spikes, and provider usage.",
+    tower: "Highlights failures, blocked approvals, and slow tasks before they get buried.",
+    mine: "Shows work volume, busy runs, and provider activity in one place.",
     replay: "Reconstructs agent runs as movement so sessions can be inspected later.",
     gate: "Receives inbound messages, webhooks, and agent lifecycle events."
   }[building.id] || "Observability zone for live agent work.";
@@ -2287,7 +2387,7 @@ function zoneWorldCardHtml(building) {
     <div class="zoneProfile">
       <p>${escapeHtml(zoneCopy)}</p>
       <div class="worldProfileStats">
-        <div><b>${recent.length}</b><span>events</span></div>
+        <div><b>${recent.length}</b><span>updates</span></div>
         <div><b>${activeAgents.length}</b><span>agents</span></div>
         <div><b>${escapeHtml(building.icon || building.kind.slice(0, 3).toUpperCase())}</b><span>zone</span></div>
       </div>
@@ -2300,11 +2400,11 @@ function zoneWorldCardHtml(building) {
         </div>
       </div>
       <div class="worldProfileBlock">
-        <h4>Recent zone events</h4>
+        <h4>Recent zone work</h4>
         <div class="worldRows">
           ${recent.map((event) => `
-            <div><b>${escapeHtml(event.type)}</b><span>${escapeHtml(event.agentName)} · ${escapeHtml(event.tool || event.phase || "event")}</span></div>
-          `).join("") || `<p>No zone events yet.</p>`}
+            <div><b>${escapeHtml(friendlyEventLabel(event))}</b><span>${escapeHtml(event.agentName)} · ${escapeHtml(friendlyTool(event))}</span></div>
+          `).join("") || `<p>No zone work yet.</p>`}
         </div>
       </div>
     </div>
@@ -2581,7 +2681,7 @@ async function demoEvent() {
     model: Math.random() > 0.5 ? "gpt-5.4" : "claude-sonnet",
     tokens: Math.floor(200 + Math.random() * 6500),
     durationMs: Math.floor(400 + Math.random() * 36000),
-    message: `Lifecycle event: ${type}`,
+    message: `${agent.name} ${friendlyEventLabel({ type }).toLowerCase()}.`,
     input: { source: "dashboard", type },
     output: isError ? { ok: false, retryable: true } : { ok: true }
   });

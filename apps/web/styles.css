@@ -145,6 +145,11 @@ button { font: inherit; color: inherit; }
   color: var(--yellow);
 }
 .panelTools { display: flex; align-items: center; gap: 8px; }
+.panelTools.activityStatus > span:not(.hiddenControl) {
+  color: var(--green);
+  font: 12px var(--mono);
+}
+.hiddenControl { display: none; }
 .panelTools select {
   max-width: 150px;
   min-height: 30px;
