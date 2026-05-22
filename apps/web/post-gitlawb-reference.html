@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AgentsWorld Reference Poster</title>
+    <style>
+      html, body {
+        margin: 0;
+        background: #020407;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      .poster {
+        position: relative;
+        width: 625px;
+        height: 1024px;
+        overflow: hidden;
+        background: #020407 url("/assets/agentsworld-map-poster-base.png") center / cover no-repeat;
+      }
+      .poster::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(180deg, rgba(2,4,7,0.04), rgba(2,4,7,0.02) 48%, rgba(2,4,7,0.07)),
+          radial-gradient(circle at 68% 30%, rgba(45,212,191,0.08), transparent 30%);
+        pointer-events: none;
+      }
+      .copy {
+        position: absolute;
+        z-index: 2;
+        left: 20px;
+        top: 16px;
+        width: 430px;
+        min-height: 200px;
+        padding: 17px 17px 18px;
+        border: 1px solid rgba(45,212,191,0.48);
+        border-radius: 10px;
+        background: rgba(3, 8, 13, 0.93);
+        box-shadow: 0 20px 70px rgba(0,0,0,0.58), 0 0 34px rgba(45,212,191,0.08);
+      }
+      .eyebrow {
+        margin: 0 0 10px;
+        color: #8dfff5;
+        font: 800 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        color: #fff7dc;
+        font-size: 29px;
+        line-height: 1.06;
+        letter-spacing: 0;
+      }
+      p {
+        margin: 10px 0 0;
+        color: rgba(247,240,220,0.84);
+        font-size: 17px;
+        line-height: 1.34;
+      }
+      .tag {
+        color: #8dfff5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="poster" id="poster">
+      <section class="copy">
+        <p class="eyebrow">GitLawb Playground Demo</p>
+        <h1>AgentsWorld makes GitLawb agents visible, inspectable, and replayable.</h1>
+        <p>Commits, PRs, delegated tasks, published apps, skills, and handoffs become a live world.</p>
+      </section>
+    </div>
+  </body>
+</html>
