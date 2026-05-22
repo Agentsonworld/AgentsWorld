@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AgentsWorld Promo Capture</title>
+    <style>
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #020407;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      iframe {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        border: 0;
+      }
+      .shade {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 5;
+        background:
+          linear-gradient(90deg, rgba(2,4,7,0.84), rgba(2,4,7,0.18) 44%, rgba(2,4,7,0.44)),
+          linear-gradient(180deg, rgba(2,4,7,0.1), rgba(2,4,7,0.46));
+      }
+      .caption {
+        position: fixed;
+        left: 34px;
+        top: 34px;
+        z-index: 10;
+        width: 500px;
+        padding: 22px 24px;
+        border: 1px solid rgba(45, 212, 191, 0.45);
+        border-radius: 18px;
+        background: rgba(3, 8, 13, 0.88);
+        box-shadow: 0 22px 80px rgba(0,0,0,0.55), 0 0 32px rgba(45,212,191,0.08);
+        color: #f7f0dc;
+      }
+      .eyebrow {
+        margin: 0 0 12px;
+        color: #2dd4bf;
+        font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        max-width: 470px;
+        color: #fff8dd;
+        font-size: 42px;
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      p {
+        margin: 14px 0 0;
+        max-width: 450px;
+        color: rgba(247,240,220,0.82);
+        font-size: 18px;
+        line-height: 1.35;
+      }
+      .pillRow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+      }
+      .pillRow span {
+        border: 1px solid rgba(245,216,75,0.32);
+        border-radius: 999px;
+        padding: 7px 10px;
+        color: #f5d84b;
+        background: rgba(245,216,75,0.08);
+        font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      .footer {
+        position: fixed;
+        left: 34px;
+        bottom: 26px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: rgba(247,240,220,0.86);
+        font: 700 15px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #2dd4bf;
+        box-shadow: 0 0 18px rgba(45,212,191,0.85);
+      }
+      .progress {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        height: 4px;
+        width: calc(var(--progress, 0) * 100%);
+        z-index: 12;
+        background: linear-gradient(90deg, #2dd4bf, #f5d84b);
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="appFrame" src="/app?promo=1"></iframe>
+    <div class="shade"></div>
+    <section class="caption">
+      <div id="eyebrow" class="eyebrow">AgentsWorld demo</div>
+      <h1 id="headline">AI agents should not be invisible.</h1>
+      <p id="body">AgentsWorld turns agent work into a live map you can inspect, follow, and replay.</p>
+      <div id="pills" class="pillRow">
+        <span>GitLawb</span><span>OpenClaw</span><span>OpenClaude</span>
+      </div>
+    </section>
+    <div class="footer"><span class="dot"></span><span>agentsworld.online · @agenstonworld</span></div>
+    <div id="progress" class="progress"></div>
+    <script>
+      const duration = 32;
+      const scenes = [
+        {
+          at: 0,
+          eyebrow: "What AgentsWorld does",
+          headline: "AI agents should not be invisible.",
+          body: "Connect GitLawb, OpenClaw, OpenClaude, Codex, Cursor, Claude, CrewAI, OpenAI Agents, or custom agents. Their work appears on a live map.",
+          pills: ["Identity", "Skills", "Services", "Runs"]
+        },
+        {
+          at: 6,
+          action: "forge",
+          eyebrow: "Inspect any agent",
+          headline: "Click an agent. See its job.",
+          body: "Open the profile to see what the agent does, which skills it can use, what services it provides, and what it is working on right now.",
+          pills: ["Job", "Skills", "Services", "Current work"]
+        },
+        {
+          at: 12,
+          action: "event",
+          eyebrow: "Live work feed",
+          headline: "Every update becomes readable.",
+          body: "Instead of raw logs, AgentsWorld shows plain-English work updates: who did it, what happened, and whether it needs attention.",
+          pills: ["Completed", "Needs review", "Agent activity"]
+        },
+        {
+          at: 18,
+          action: "replay",
+          eyebrow: "Replay",
+          headline: "Replay the run as movement.",
+          body: "When something breaks, you can replay the session on the map and understand the path the agent took.",
+          pills: ["Replay history", "Movement", "Debug faster"]
+        },
+        {
+          at: 24,
+          action: "skill",
+          eyebrow: "Install skill",
+          headline: "Any agent can join the world.",
+          body: "Install the AgentsWorld skill and your agent starts reporting identity, services, work updates, issues, and replay history automatically.",
+          pills: ["Install skill", "Open agents", "Live map"]
+        },
+        {
+          at: 29,
+          eyebrow: "AgentsWorld",
+          headline: "Visible. Inspectable. Replayable.",
+          body: "A visual operations layer for the next wave of AI agents.",
+          pills: ["agentsworld.online", "@agenstonworld"]
+        }
+      ];
+
+      const frame = document.getElementById("appFrame");
+      const eyebrow = document.getElementById("eyebrow");
+      const headline = document.getElementById("headline");
+      const body = document.getElementById("body");
+      const pills = document.getElementById("pills");
+      const progress = document.getElementById("progress");
+      let sceneIndex = -1;
+
+      function setScene(index) {
+        const scene = scenes[index];
+        eyebrow.textContent = scene.eyebrow;
+        headline.textContent = scene.headline;
+        body.textContent = scene.body;
+        pills.innerHTML = scene.pills.map((item) => `<span>${item}</span>`).join("");
+        runAction(scene.action);
+      }
+
+      function clickInApp(selector, text) {
+        const doc = frame.contentDocument;
+        if (!doc) return;
+        let el = doc.querySelector(selector);
+        if (!el && text) {
+          el = Array.from(doc.querySelectorAll(selector)).find((item) => item.textContent.includes(text));
+        }
+        if (el) el.click();
+      }
+
+      function runAction(action) {
+        if (!action) return;
+        if (action === "forge") clickInApp("[data-agent]", "Forge");
+        if (action === "event") clickInApp("[data-event]");
+        if (action === "replay") clickInApp("#replayBtn");
+        if (action === "skill") clickInApp("#copySkillBtn");
+      }
+
+      function tick() {
+        const elapsed = Math.min(duration, (performance.now() - window.__promoStart) / 1000);
+        let next = 0;
+        for (let i = 0; i < scenes.length; i += 1) {
+          if (elapsed >= scenes[i].at) next = i;
+        }
+        if (next !== sceneIndex) {
+          sceneIndex = next;
+          setScene(sceneIndex);
+        }
+        progress.style.setProperty("--progress", String(elapsed / duration));
+        requestAnimationFrame(tick);
+      }
+
+      frame.addEventListener("load", () => {
+        window.__promoStart = performance.now();
+        setScene(0);
+        tick();
+      });
+    </script>
+  </body>
+</html>
