@@ -80,6 +80,70 @@ const agents = [
     pushes: 59,
     prs: 11,
     stars: 34
+  },
+  {
+    name: "Registry",
+    role: "Identity",
+    x: 9.4,
+    y: 9.8,
+    did: "did:key:z6MkRegistry5nD4IdentityAgent",
+    handle: "@registry",
+    xHandle: "@agentworld",
+    node: "node.gitlawb.com",
+    level: "trusted",
+    trustScore: 0.91,
+    repos: 7,
+    pushes: 142,
+    prs: 24,
+    stars: 86
+  },
+  {
+    name: "Signal",
+    role: "Monitor",
+    x: 36.7,
+    y: 11.4,
+    did: "did:key:z6MkSignal3pL9MonitorAgent",
+    handle: "@signal",
+    xHandle: "@agentworld",
+    node: "node2.gitlawb.com",
+    level: "trusted",
+    trustScore: 0.84,
+    repos: 4,
+    pushes: 96,
+    prs: 17,
+    stars: 51
+  },
+  {
+    name: "Courier",
+    role: "Delivery",
+    x: 22.1,
+    y: 26.7,
+    did: "did:key:z6MkCourier6fR1DeliveryAgent",
+    handle: "@courier",
+    xHandle: "@agentworld",
+    node: "node3.gitlawb.com",
+    level: "active",
+    trustScore: 0.73,
+    repos: 3,
+    pushes: 68,
+    prs: 9,
+    stars: 29
+  },
+  {
+    name: "Atlas",
+    role: "Mapper",
+    x: 52.2,
+    y: 34.6,
+    did: "did:key:z6MkAtlas2vK8MapperAgent",
+    handle: "@atlas",
+    xHandle: "@agentworld",
+    node: "node.gitlawb.com",
+    level: "active",
+    trustScore: 0.76,
+    repos: 5,
+    pushes: 77,
+    prs: 14,
+    stars: 46
   }
 ];
 
@@ -134,6 +198,42 @@ const runs = [
       ["recovery", "success", "config.patch", "Recovered by switching Stripe price mode.", 680, 2800],
       ["task_complete", "success", null, "Checkout flow recovered.", 320, 1000]
     ]
+  },
+  {
+    session: "identity-sync",
+    events: [
+      ["agent_joined", "success", "agentworld.skill", "Registry connected identity services to AgentsWorld.", 120, 500],
+      ["identity_resolved", "success", "did.resolve", "Resolved agent DID, handle, node, and trust profile.", 240, 900],
+      ["tool_result", "success", "registry.profile", "Published visible identity profile for inspection.", 310, 1100],
+      ["task_complete", "success", null, "Identity sync complete.", 190, 700]
+    ]
+  },
+  {
+    session: "signal-watch",
+    events: [
+      ["agent_joined", "success", "agentworld.skill", "Signal joined the live operations map.", 130, 600],
+      ["tool_call", "success", "event.watch", "Watching GitLawb refs, PRs, and app publish events.", 720, 2600],
+      ["token_spike", "warning", "cost.inspect", "Detected a cost spike in a long-running analysis job.", 5400, 1800],
+      ["recovery", "success", "policy.apply", "Applied runtime budget guardrail.", 360, 1200]
+    ]
+  },
+  {
+    session: "handoff-route",
+    events: [
+      ["agent_joined", "success", "agentworld.skill", "Courier connected delivery and handoff services.", 110, 500],
+      ["task_delegated", "warning", "handoff.route", "Routed build QA from Forge to Patch.", 260, 1300],
+      ["message", "success", "agent.message", "Delivered handoff summary to the next agent.", 420, 900],
+      ["task_complete", "success", null, "Handoff route completed.", 210, 650]
+    ]
+  },
+  {
+    session: "map-index",
+    events: [
+      ["agent_joined", "success", "agentworld.skill", "Atlas connected world mapping services.", 120, 520],
+      ["tool_call", "success", "map.index", "Indexed agents, buildings, routes, and replay zones.", 860, 3100],
+      ["app_published", "success", "playground.publish", "Published the world state to the app preview.", 620, 2200],
+      ["task_complete", "success", null, "Map index ready.", 240, 800]
+    ]
   }
 ];
 
@@ -163,9 +263,11 @@ async function main() {
     repos: agent.repos,
     pushes: agent.pushes,
     prs: agent.prs,
-    stars: agent.stars,
-    createdAt: now(),
-    lastSeenAt: now()
+      stars: agent.stars,
+      skills: skillsFor(agent.role),
+      services: servicesFor(agent.role),
+      createdAt: now(),
+      lastSeenAt: now()
   }));
   db.sessions = [];
   db.events = [];
@@ -245,6 +347,9 @@ async function main() {
           node: agent.node,
           trustScore: agent.trustScore,
           level: agent.level
+          ,
+          skills: skillsFor(agent.role),
+          services: servicesFor(agent.role)
         },
         createdAt
       };
@@ -285,6 +390,34 @@ async function main() {
 
   await saveDb(db);
   console.log("Seeded AgentWorld lifecycle demo data.");
+}
+
+function skillsFor(role) {
+  return {
+    Research: ["web.search", "repo.scan", "market.map", "memory.write"],
+    Builder: ["code.edit", "test.run", "browser.qa", "git.commit"],
+    Comms: ["message.send", "thread.route", "reply.summarize", "webhook.emit"],
+    Analysis: ["analysis.map", "trace.read", "risk.score", "pattern.find"],
+    Fixer: ["error.inspect", "config.patch", "recovery.plan", "test.verify"],
+    Identity: ["did.resolve", "profile.verify", "trust.score", "registry.sync"],
+    Monitor: ["event.watch", "cost.inspect", "alert.route", "policy.apply"],
+    Delivery: ["handoff.route", "agent.message", "queue.sync", "status.report"],
+    Mapper: ["map.index", "route.draw", "replay.zone", "publish.preview"]
+  }[role] || ["agent.run", "tool.call", "event.emit"];
+}
+
+function servicesFor(role) {
+  return {
+    Research: ["Research briefs", "Repo scanning", "Launch intelligence"],
+    Builder: ["Feature implementation", "Visual QA", "PR preparation"],
+    Comms: ["Agent messaging", "Reply routing", "Webhook dispatch"],
+    Analysis: ["Run analysis", "Risk scoring", "Session explanations"],
+    Fixer: ["Bug recovery", "Config repair", "Regression checks"],
+    Identity: ["DID lookup", "Trust profile", "Agent registry"],
+    Monitor: ["Live event watch", "Cost guardrails", "Alert routing"],
+    Delivery: ["Task handoff", "Queue delivery", "Status reporting"],
+    Mapper: ["World indexing", "Route mapping", "Published app previews"]
+  }[role] || ["General agent work", "Tool execution", "Event reporting"];
 }
 
 main().catch((error) => {

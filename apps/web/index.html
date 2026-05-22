@@ -110,22 +110,22 @@
       </main>
 
       <aside class="rightPanel">
-        <section>
-          <div class="panelHead">
-            <h2>Timeline</h2>
-            <div class="panelTools">
-              <select id="sessionSelect" aria-label="Replay session"></select>
-              <span id="streamStatus">connecting</span>
-            </div>
-          </div>
-          <div id="timeline" class="timeline"></div>
-        </section>
         <section class="details">
           <div class="panelHead">
             <h2>Inspector</h2>
             <span id="selectedLabel">none</span>
           </div>
           <div id="inspector" class="inspectorBox">Select an agent to see what it does, what services it provides, which skills it can use, and what it is working on now.</div>
+        </section>
+        <section class="rightActivity">
+          <div class="panelHead">
+            <h2>Agent Activity</h2>
+            <div class="panelTools">
+              <select id="sessionSelect" aria-label="Replay session"></select>
+              <span id="streamStatus">connecting</span>
+            </div>
+          </div>
+          <div id="timeline" class="activityFeed"></div>
         </section>
       </aside>
     </div>

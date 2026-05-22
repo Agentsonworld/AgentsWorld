@@ -42,7 +42,7 @@ button { font: inherit; color: inherit; }
   overflow: auto;
 }
 .leftPanel { border-right: 1px solid var(--border); padding: 14px; }
-.rightPanel { border-left: 1px solid var(--border); padding: 14px; display: grid; grid-template-rows: minmax(0, 1fr) minmax(220px, 0.82fr); gap: 12px; }
+.rightPanel { border-left: 1px solid var(--border); padding: 14px; display: grid; grid-template-rows: minmax(280px, 1fr) minmax(260px, 0.9fr); gap: 12px; }
 
 .brand { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
 .mark {
@@ -145,7 +145,7 @@ button { font: inherit; color: inherit; }
   font-size: 12px;
 }
 
-.agentList, .timeline, .alerts { display: grid; gap: 8px; }
+.agentList, .activityFeed, .alerts { display: grid; gap: 8px; }
 .agentCard, .eventCard, .alertCard {
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -631,7 +631,7 @@ h1 { margin: 0; font-size: clamp(19px, 2vw, 28px); line-height: 1.08; letter-spa
 }
 
 section { min-height: 0; overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
-.timeline, .alerts { overflow: auto; padding-right: 4px; }
+.activityFeed, .alerts { overflow: auto; padding-right: 4px; }
 .eventCard p, .alertCard p { margin: 7px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
 .eventType { color: var(--yellow); font-family: var(--mono); font-size: 12px; }
 .eventStats {

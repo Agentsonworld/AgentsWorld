@@ -1690,7 +1690,7 @@ function renderLists() {
     `;
   }).join("");
 
-  els.timeline.innerHTML = state.events.slice(0, 80).map((event) => `
+  if (els.timeline) els.timeline.innerHTML = state.events.slice(0, 80).map((event) => `
     <article class="eventCard ${event.severity || event.status}" data-event="${event.id}" style="--event-color:${eventColor(event)}">
       <div class="eventTop"><b>${event.agentName}</b><span class="eventType">${event.type}</span></div>
       <div class="eventMeta">${event.phase || "log"} · ${event.sessionName} · ${event.tool || "no tool"} · ${new Date(event.createdAt).toLocaleTimeString()}</div>
@@ -1703,11 +1703,13 @@ function renderLists() {
     </article>
   `).join("");
 
-  const selected = els.sessionSelect.value;
-  els.sessionSelect.innerHTML = state.sessions.map((session) => `
-    <option value="${session.id}">${session.name}</option>
-  `).join("");
-  if (selected && state.sessions.some((session) => session.id === selected)) els.sessionSelect.value = selected;
+  if (els.sessionSelect) {
+    const selected = els.sessionSelect.value;
+    els.sessionSelect.innerHTML = state.sessions.map((session) => `
+      <option value="${session.id}">${session.name}</option>
+    `).join("");
+    if (selected && state.sessions.some((session) => session.id === selected)) els.sessionSelect.value = selected;
+  }
 }
 
 function escapeHtml(value = "") {
@@ -1991,7 +1993,7 @@ function agentProfileFor(agent) {
       services: ["Incident recovery", "Tool failure fixes", "Config repair", "Regression checks"]
     },
     operator: {
-      work: "Runs general agent tasks and reports progress into the live AgentsWorld timeline.",
+      work: "Runs general agent tasks and reports progress into the live AgentsWorld activity feed.",
       skills: ["task.run", "tool.call", "memory.write", "status.report"],
       services: ["General automation", "Task tracking", "Session replay"]
     },
@@ -2226,7 +2228,7 @@ function buildingHtml(building) {
     replay: [
       ["Replayable sessions", state.sessions.length],
       ["Latest session", state.sessions[0]?.name || "none"],
-      ["Timeline events", state.events.length],
+      ["Activity events", state.events.length],
       ["Replay speed", "900ms/event"]
     ],
     tools: [
@@ -2321,7 +2323,7 @@ When loaded, the agent should:
 3. POST task/tool/result/error events during the run.
 4. POST task_complete when the run finishes.
 
-Any agent that follows this skill appears on the AgentsWorld map with its profile, skills, services, timeline, and replay.`;
+Any agent that follows this skill appears on the AgentsWorld map with its profile, skills, services, activity feed, and replay.`;
   const curl = `curl -s -X POST ${location.origin}/v1/events \\
   -H "Content-Type: application/json" \\
   -d '{
