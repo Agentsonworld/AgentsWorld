@@ -2525,16 +2525,16 @@ function startReplay() {
   state.replay = { active: true, events, index: 0, timer: null };
   setLayerMode("replay");
   inspect("replay", { session, events: events.length });
-  els.replayLabel.textContent = `Replaying ${session.name}`;
-  els.replayMeta.textContent = `${events.length} events`;
-  els.replayProgress.style.width = "0%";
+  if (els.replayLabel) els.replayLabel.textContent = `Replaying ${session.name}`;
+  if (els.replayMeta) els.replayMeta.textContent = `${events.length} events`;
+  if (els.replayProgress) els.replayProgress.style.width = "0%";
   state.replay.timer = setInterval(() => {
     const event = state.replay.events[state.replay.index++];
     if (!event) {
       clearInterval(state.replay.timer);
       state.replay.active = false;
-      els.replayLabel.textContent = "Replay complete";
-      els.replayMeta.textContent = session.name;
+      if (els.replayLabel) els.replayLabel.textContent = "Replay complete";
+      if (els.replayMeta) els.replayMeta.textContent = session.name;
       showToast("Replay finished");
       return;
     }
@@ -2544,10 +2544,17 @@ function startReplay() {
     const progress = document.getElementById("modalReplayProgress");
     const pct = Math.round((state.replay.index / state.replay.events.length) * 100);
     if (progress) progress.style.width = `${pct}%`;
-    els.replayProgress.style.width = `${pct}%`;
+    if (els.replayProgress) els.replayProgress.style.width = `${pct}%`;
   }, 900);
   showToast(`Replaying ${events.length} events`);
 }
+
+document.querySelectorAll("[data-external-link]").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.location.href = link.href;
+  });
+});
 
 async function copySnippet(id) {
   const text = document.getElementById(id)?.textContent || "";

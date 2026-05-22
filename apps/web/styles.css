@@ -66,6 +66,16 @@ button { font: inherit; color: inherit; }
 }
 .brand strong { display: block; font-size: 18px; }
 .brand span, .panelHead span, .statsGrid span, .agentMeta, .agentTask, .eventMeta, .onboardingCard span, .agentIdentityLine { color: var(--muted); font-size: 12px; }
+.brandX {
+  margin-left: auto;
+  border: 1px solid rgba(245, 216, 75, 0.34);
+  border-radius: 8px;
+  background: rgba(245, 216, 75, 0.1);
+  padding: 7px 9px;
+  color: #fff4b8;
+  font-size: 12px;
+  text-decoration: none;
+}
 .onboardingCard {
   display: grid;
   gap: 8px;
@@ -234,6 +244,17 @@ h1 { margin: 0; font-size: clamp(19px, 2vw, 28px); line-height: 1.08; letter-spa
   min-height: 38px;
   background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025));
 }
+.topLink {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(245, 216, 75, 0.34);
+  border-radius: 8px;
+  background: rgba(245, 216, 75, 0.1);
+  padding: 8px 11px;
+  color: #fff4b8;
+  text-decoration: none;
+}
 .canvasFrame { position: relative; min-height: 0; }
 .canvasFrame::before {
   content: "";
@@ -330,28 +351,6 @@ h1 { margin: 0; font-size: clamp(19px, 2vw, 28px); line-height: 1.08; letter-spa
   font-size: 12px;
   backdrop-filter: blur(12px);
 }
-.replayHud {
-  position: absolute;
-  right: 16px;
-  bottom: 18px;
-  width: min(360px, calc(100% - 32px));
-  display: grid;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid rgba(74, 222, 128, 0.25);
-  border-radius: 10px;
-  background: rgba(8, 9, 11, 0.76);
-  backdrop-filter: blur(12px);
-  z-index: 3;
-}
-.replayHud div:first-child {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.replayHud b { color: var(--green); font-size: 13px; }
-.replayHud span { color: var(--muted); font-size: 12px; text-align: right; }
 .proximityPrompt {
   position: absolute;
   z-index: 4;
