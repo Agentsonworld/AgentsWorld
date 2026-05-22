@@ -2695,7 +2695,7 @@ async function demoEvent() {
     model: Math.random() > 0.5 ? "gpt-5.4" : "claude-sonnet",
     tokens: Math.floor(200 + Math.random() * 6500),
     durationMs: Math.floor(400 + Math.random() * 36000),
-    message: `${agent.name} ${friendlyEventLabel({ type }).toLowerCase()}.`,
+    message: `${agent} ${friendlyEventLabel({ type }).toLowerCase()}.`,
     input: { source: "dashboard", type },
     output: isError ? { ok: false, retryable: true } : { ok: true }
   });
